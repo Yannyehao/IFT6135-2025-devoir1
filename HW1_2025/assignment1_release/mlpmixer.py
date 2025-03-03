@@ -17,7 +17,7 @@ class PatchEmbed(nn.Module):
         self.num_patches = self.grid_size * self.grid_size
         
         # Uncomment this line and replace ? with correct values
-        #self.proj = nn.Conv2d(?, ?, kernel_size=?, stride=?)
+        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
 
     def forward(self, x):
         """
@@ -76,7 +76,18 @@ class MixerBlock(nn.Module):
         self.mlp_channels = Mlp(dim, channels_dim, act_layer=act_layer, drop=drop)
 
     def forward(self, x):
-        raise NotImplementedError
+        residual = x
+        x = self.norm1(x)
+        x_t = x.transpose(1, 2)
+        x_t = self.mlp_tokens(x_t)
+        x_t = x_t.transpose(1, 2)
+        x = x + x_t
+        
+        residual = x
+        x = self.norm2(x)
+        x = self.mlp_channels(x)
+        x = x + residual
+        return x
     
 
 class MLPMixer(nn.Module):
@@ -113,14 +124,40 @@ class MLPMixer(nn.Module):
         :param images: [batch, 3, img_size, img_size]
         """
         # step1: Go through the patch embedding
+        x = self.patchemb(images)
+        
         # step 2 Go through the mixer blocks
+        x = self.blocks(x)
+        
         # step 3 go through layer norm
+        x = self.norm(x)
+        
         # step 4 Global averaging spatially
+        x = x.mean(dim=1)
+        
         # Classification
-        raise NotImplementedError
+        x = self.head(x)
+        return x
     
     def visualize(self, logdir):
         """ Visualize the token mixer layer 
         in the desired directory """
-        raise NotImplementedError
- 
+        os.makedirs(logdir, exist_ok=True)
+
+        block0 = self.blocks[0]
+
+        w = block0.mlp_tokens.fc1.weight.data.cpu().numpy()
+
+        plt.figure(figsize=(8, 6))
+        plt.imshow(w, aspect='auto', cmap='viridis')
+        plt.colorbar()
+        plt.title('Token Mixing (Block 0) - fc1 Weight')
+        plt.xlabel('Input Features (seq_len)')
+        plt.ylabel('Hidden Features')
+
+        save_path = os.path.join(logdir, 'token_mixer_block0_fc1.png')
+        plt.savefig(save_path)
+        plt.close()
+
+        print(f"Visualization saved to {save_path}")
+    
