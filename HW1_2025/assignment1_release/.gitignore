@@ -2,3 +2,5 @@ exps
 *.png
 data/
 results/
+my_plots/
+
