@@ -9,7 +9,7 @@ import torch
 from torch import optim
 from torchvision.datasets import CIFAR10
 from torchvision import transforms
-from utils import seed_experiment, to_device, cross_entropy_loss, compute_accuracy
+from utils import seed_experiment, to_device, cross_entropy_loss, compute_accuracy,generate_plots
 from config import get_config_parser
 import json
 from mlp import MLP
