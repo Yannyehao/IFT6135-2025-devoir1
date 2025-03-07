@@ -42,9 +42,9 @@ def train(epoch, model, dataloader, optimizer, args):
 
         if idx % args.print_every == 0:
             tqdm.write(f"[TRAIN] Epoch: {epoch}, Iter: {idx}, Loss: {loss.item():.5f}")
-    tqdm.write(f"== [TRAIN] Epoch: {epoch}, Accuracy: {epoch_accuracy:.3f} ==>")
-    return epoch_loss, epoch_accuracy, time.time() - start_time
-
+    wall_time = time.time() - start_time
+    tqdm.write(f"== [TRAIN] Epoch: {epoch}, Accuracy: {epoch_accuracy:.3f}, Time:{wall_time:.2f}s==>")
+    return epoch_loss, epoch_accuracy, wall_time
 
 def evaluate(epoch, model, dataloader, args, mode="val"):
     model.eval()
@@ -66,10 +66,11 @@ def evaluate(epoch, model, dataloader, args, mode="val"):
                 tqdm.write(
                     f"[{mode.upper()}] Epoch: {epoch}, Iter: {idx}, Loss: {loss.item():.5f}"
                 )
+        wall_time = time.time() - start_time
         tqdm.write(
-            f"=== [{mode.upper()}] Epoch: {epoch}, Iter: {idx}, Accuracy: {epoch_accuracy:.3f} ===>"
+            f"=== [{mode.upper()}] Epoch: {epoch}, Iter: {idx}, Accuracy: {epoch_accuracy:.3f}, Time: {wall_time:.2f}s ===>"
         )
-    return epoch_loss, epoch_accuracy, time.time() - start_time
+    return epoch_loss, epoch_accuracy, wall_time
 
         
 if __name__ == "__main__":
@@ -161,6 +162,9 @@ if __name__ == "__main__":
     train_dataloader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, drop_last=True, pin_memory=True, num_workers=4)
     valid_dataloader = DataLoader(val_set, batch_size=args.batch_size, shuffle=False, drop_last=False, num_workers=4)
     test_dataloader = DataLoader(test_set, batch_size=args.batch_size, shuffle=False, drop_last=False, num_workers=4)
+    
+    total_training_start_time = time.time()
+    
     for epoch in range(args.epochs):
         tqdm.write(f"====== Epoch {epoch} ======>")
         loss, acc, wall_time = train(epoch, model, train_dataloader, optimizer,args)
@@ -177,7 +181,9 @@ if __name__ == "__main__":
         epoch, model, test_dataloader, args, mode="test"
     )
     print(f"===== Best validation Accuracy: {max(valid_accs):.3f} =====>")
-
+    total_training_end_time = time.time()
+    print(f"Total training time: {total_training_end_time - total_training_start_time:.2f}s")
+    
     # Save log if logdir provided
     if args.logdir is not None:
         print(f'Writing training logs to {args.logdir}...')
