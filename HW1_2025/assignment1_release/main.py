@@ -19,6 +19,8 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 import time
 import os
+import matplotlib.pyplot as plt
+
 
 def train(epoch, model, dataloader, optimizer, args):
     model.train()
@@ -71,6 +73,8 @@ def evaluate(epoch, model, dataloader, args, mode="val"):
             f"=== [{mode.upper()}] Epoch: {epoch}, Iter: {idx}, Accuracy: {epoch_accuracy:.3f}, Time: {wall_time:.2f}s ===>"
         )
     return epoch_loss, epoch_accuracy, wall_time
+
+
 
         
 if __name__ == "__main__":
