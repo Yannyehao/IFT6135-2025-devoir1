@@ -12,7 +12,7 @@ def get_config_parser():
     model.add_argument(
         "--model",
         type=str,
-        choices=["mlp", "resnet18", "mlpmixer"],
+        choices=["mlp", "resnet18", "mlpmixer","mlpmixer_width"],
         default="mlp",
         help="name of the model to run (default: %(default)s).",
     )

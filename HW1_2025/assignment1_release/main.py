@@ -15,6 +15,7 @@ import json
 from mlp import MLP
 from resnet18 import ResNet18
 from mlpmixer import MLPMixer
+from mlpmixer_width import MLPMixer_Width
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 import time
@@ -130,7 +131,7 @@ if __name__ == "__main__":
     for key, val in model_config.items():
         print(f'{key}:\t{val}')
     print('############################################')
-    model_cls = {'mlp': MLP, 'resnet18': ResNet18, 'mlpmixer': MLPMixer}[args.model]
+    model_cls = {'mlp': MLP, 'resnet18': ResNet18, 'mlpmixer': MLPMixer,'mlpmixer_width':MLPMixer_Width}[args.model]
     model = model_cls(**model_config)
     model.to(args.device)
     

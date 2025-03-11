@@ -1,0 +1,11 @@
+{
+    "num_classes": 10,
+    "img_size": 32,
+    "patch_size": 4,
+    "embed_dim": 256,
+    "num_blocks": 8,
+    "token_mixer_dim": 256,
+    "channel_mixer_dim": 256,
+    "drop_rate": 0.0,
+    "activation": "gelu"
+}
